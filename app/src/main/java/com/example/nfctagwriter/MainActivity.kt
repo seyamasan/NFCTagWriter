@@ -2,6 +2,7 @@ package com.example.nfctagwriter
 
 import android.nfc.NfcAdapter
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -21,8 +22,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // デフォルトの NFC アダプターを取得
+        // デフォルトの NFC アダプター(コントローラー)を取得
+        // NFCに関する処理をコントロールできる
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
+
+        if (nfcAdapter == null) {
+            val toast = Toast.makeText(this, "この端末はNFC非対応です。", Toast.LENGTH_SHORT)
+            toast.show()
+        }
 
         enableEdgeToEdge()
         setContent {
