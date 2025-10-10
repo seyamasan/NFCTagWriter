@@ -1,5 +1,6 @@
 package com.example.nfctagwriter
 
+import android.nfc.NfcAdapter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,8 +15,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.nfctagwriter.ui.theme.NFCTagWriterTheme
 
 class MainActivity : ComponentActivity() {
+
+    private var nfcAdapter: NfcAdapter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // デフォルトの NFC アダプターを取得
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this)
+
         enableEdgeToEdge()
         setContent {
             NFCTagWriterTheme {
