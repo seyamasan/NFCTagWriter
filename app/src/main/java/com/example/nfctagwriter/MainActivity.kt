@@ -76,7 +76,7 @@ class MainActivity : ComponentActivity() {
     private fun disableReaderMode() {
         val adapter = nfcAdapter ?: return
 
-        // NFC アダプターを元に戻す
+        // リーダーモードを元に戻す
         adapter.disableReaderMode(this)
     }
 }
