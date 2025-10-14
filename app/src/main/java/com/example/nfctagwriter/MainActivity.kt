@@ -1,6 +1,7 @@
 package com.example.nfctagwriter
 
 import android.nfc.NfcAdapter
+import android.nfc.Tag
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -18,6 +19,12 @@ import com.example.nfctagwriter.ui.theme.NFCTagWriterTheme
 class MainActivity : ComponentActivity() {
 
     private var nfcAdapter: NfcAdapter? = null
+
+    private val readerCallback = NfcAdapter.ReaderCallback { tag: Tag? ->
+        if (tag == null) return@ReaderCallback
+
+        // ここで書き込み処理を書く予定
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +49,23 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        enableReaderMode()
+    }
+
+    private fun enableReaderMode() {
+        val adapter = nfcAdapter ?: return
+
+        // NTAG215を使う予定なので、Type A のフラグを使う
+        // プラットフォーム(Android)によるNDEFチェックを防止する
+        val flag = NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
+
+        // NFC アダプターをリーダーモードに制限する
+        adapter.enableReaderMode(this, readerCallback, flag, null)
     }
 }
 
