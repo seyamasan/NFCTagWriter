@@ -57,6 +57,12 @@ class MainActivity : ComponentActivity() {
         enableReaderMode()
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        disableReaderMode()
+    }
+
     private fun enableReaderMode() {
         val adapter = nfcAdapter ?: return
 
@@ -66,6 +72,13 @@ class MainActivity : ComponentActivity() {
 
         // NFC アダプターをリーダーモードに制限する
         adapter.enableReaderMode(this, readerCallback, flag, null)
+    }
+
+    private fun disableReaderMode() {
+        val adapter = nfcAdapter ?: return
+
+        // NFC アダプターを元に戻す
+        adapter.disableReaderMode(this)
     }
 }
 
