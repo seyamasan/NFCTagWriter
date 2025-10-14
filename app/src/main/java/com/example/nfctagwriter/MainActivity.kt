@@ -67,8 +67,7 @@ class MainActivity : ComponentActivity() {
         val adapter = nfcAdapter ?: return
 
         // NTAG215を使う予定なので、Type A のフラグを使う
-        // プラットフォーム(Android)によるNDEFチェックを防止する
-        val flag = NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
+        val flag = NfcAdapter.FLAG_READER_NFC_A
 
         // NFC アダプターをリーダーモードに制限する
         adapter.enableReaderMode(this, readerCallback, flag, null)
