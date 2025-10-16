@@ -7,11 +7,24 @@ import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import com.example.nfctagwriter.ui.theme.NFCTagWriterTheme
 import androidx.core.net.toUri
@@ -19,16 +32,19 @@ import androidx.core.net.toUri
 @Composable
 fun NfcTagWriterScreen(modifier: Modifier = Modifier) {
 
+    var inputText by rememberSaveable { mutableStateOf("") }
+    var isWritingUrlToTag by rememberSaveable { mutableStateOf(false) }
+
     val context = LocalContext.current
     val activity = (context as ComponentActivity)
 
     var nfcAdapter: NfcAdapter? = null
 
     val readerCallback = NfcAdapter.ReaderCallback { tag: Tag? ->
-        if (tag == null) return@ReaderCallback
+        if (tag == null || !isWritingUrlToTag) return@ReaderCallback
 
         // URIレコードを作成
-        val uriRecord = NdefRecord.createUri("".toUri())
+        val uriRecord = NdefRecord.createUri(inputText.toUri())
         val message = NdefMessage(arrayOf(uriRecord))
 
         try {
@@ -135,10 +151,31 @@ fun NfcTagWriterScreen(modifier: Modifier = Modifier) {
         }
     }
 
-    Text(
-        text = "Hello Android!",
-        modifier = modifier
-    )
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Text(
+                text = "書き込みたいURLを入力しよう！",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            OutlinedTextField(
+                value = inputText,
+                onValueChange = { inputText = it },
+                singleLine = true,
+                placeholder = { Text(text = "URLを入力")}
+            )
+
+            Button(onClick = { isWritingUrlToTag = !isWritingUrlToTag }) {
+                Text(if (isWritingUrlToTag) "書き込み中..." else "書き込む")
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)
