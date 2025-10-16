@@ -1,7 +1,10 @@
 package com.example.nfctagwriter
 
+import android.nfc.NdefMessage
+import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
 import android.nfc.Tag
+import android.nfc.tech.Ndef
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.Text
@@ -11,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.Lifecycle
 import com.example.nfctagwriter.ui.theme.NFCTagWriterTheme
+import androidx.core.net.toUri
 
 @Composable
 fun NfcTagWriterScreen(modifier: Modifier = Modifier) {
@@ -23,7 +27,78 @@ fun NfcTagWriterScreen(modifier: Modifier = Modifier) {
     val readerCallback = NfcAdapter.ReaderCallback { tag: Tag? ->
         if (tag == null) return@ReaderCallback
 
-        // ここで書き込み処理を書く予定
+        // URIレコードを作成
+        val uriRecord = NdefRecord.createUri("".toUri())
+        val message = NdefMessage(arrayOf(uriRecord))
+
+        try {
+            val ndef = Ndef.get(tag)
+
+            if (ndef != null) {
+                ndef.connect()
+
+                // 書き込み可能かチェック
+                if (!ndef.isWritable) {
+                    ndef.close()
+
+                    // UIスレッドで表示する
+                    activity.runOnUiThread {
+                        Toast.makeText(
+                            activity,
+                            "タグが書き込み禁止です。",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    return@ReaderCallback
+                }
+
+                // 容量チェック
+                val needed = message.toByteArray().size
+                val max = ndef.maxSize
+                if (needed > max) {
+                    ndef.close()
+
+                    activity.runOnUiThread {
+                        Toast.makeText(
+                            activity,
+                            "容量不足: 必要 $needed / 上限 $max バイト",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    return@ReaderCallback
+                }
+
+                // 書き込み
+                ndef.writeNdefMessage(message)
+                ndef.close()
+
+                activity.runOnUiThread {
+                    Toast.makeText(
+                        activity,
+                        "URLを書き込みました。",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } else {
+                activity.runOnUiThread {
+                    Toast.makeText(
+                        activity,
+                        "書き込みできませんでした。",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        } catch (e: Exception) {
+            activity.runOnUiThread {
+                Toast.makeText(
+                    activity,
+                    "書き込みエラー: ${e.message ?: ""}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
     ObserveLifecycleEvent { event ->
