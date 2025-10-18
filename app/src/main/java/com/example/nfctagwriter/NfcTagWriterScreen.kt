@@ -43,11 +43,12 @@ fun NfcTagWriterScreen(modifier: Modifier = Modifier) {
     val readerCallback = NfcAdapter.ReaderCallback { tag: Tag? ->
         if (tag == null || !isWritingUrlToTag) return@ReaderCallback
 
-        // URIレコードを作成
-        val uriRecord = NdefRecord.createUri(inputText.toUri())
-        val message = NdefMessage(arrayOf(uriRecord))
-
         try {
+            // URIレコードを作成
+            val uriRecord = NdefRecord.createUri(inputText.toUri())
+            val message = NdefMessage(arrayOf(uriRecord))
+
+            // 読み込んだタグのNDEFを取得
             val ndef = Ndef.get(tag)
 
             if (ndef != null) {
