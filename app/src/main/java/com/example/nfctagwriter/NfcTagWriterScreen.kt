@@ -73,7 +73,7 @@ fun NfcTagWriterScreen(modifier: Modifier = Modifier) {
                 // 容量チェック
                 val needed = message.toByteArray().size
                 val max = ndef.maxSize
-                if (max < needed ) {
+                if (max < needed) {
                     ndef.close()
 
                     activity.runOnUiThread {
