@@ -115,6 +115,9 @@ fun NfcTagWriterScreen(modifier: Modifier = Modifier) {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+        } finally {
+            // 書き込み処理終了
+            isWritingUrlToTag = false
         }
     }
 
