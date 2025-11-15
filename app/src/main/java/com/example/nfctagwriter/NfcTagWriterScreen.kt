@@ -164,13 +164,13 @@ fun NfcTagWriterScreen(modifier: Modifier = Modifier) {
                 val flag = NfcAdapter.FLAG_READER_NFC_A
 
                 // NFC アダプターをリーダーモードに制限する
-                nfcAdapter?.enableReaderMode(activity, readerCallback, flag, null)
+                nfcAdapter.enableReaderMode(activity, readerCallback, flag, null)
             }
             Lifecycle.Event.ON_PAUSE -> {
                 if (nfcAdapter == null) { return@ObserveLifecycleEvent }
 
                 // リーダーモードを元に戻す
-                nfcAdapter?.disableReaderMode(activity)
+                nfcAdapter.disableReaderMode(activity)
             }
             else -> {}
         }
